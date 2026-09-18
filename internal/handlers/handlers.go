@@ -6,10 +6,10 @@ import (
 	"html/template"
 	"log"
 	"net"
-	"net/http"f
+	"net/http"
 	"strings"
 	"sync"
-	"time"f
+	"time"
 
 	"internet-manager-go/internal/config"
 	"internet-manager-go/internal/i18n"
@@ -73,7 +73,6 @@ func (a *App) requireRole(roles ...string) func(http.HandlerFunc) http.HandlerFu
 		}
 	}
 }
-
 
 func (a *App) baseData(r *http.Request) map[string]any {
 	lang := i18n.FromRequest(r)
@@ -297,17 +296,21 @@ func (a *App) adminPanel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ifaces := a.MT.GetInterfaces(settings)
-		gw := a.MT.GetInterfaceGateways()
-		currentIface, currentGW := a.MT.GetCurrentDefaultIface()
-	
-		data := merge(a.baseData(r), map[string]any{
-			"Users": users, "Tables": tables, "Leases": leases,
-			"Interfaces": ifaces, "Gateways": gw,
-			"CurrentDefaultIface": currentIface,
-			"CurrentDefaultGW":    currentGW,
-			"CustomCount": custom, "BlockedCount": blocked,
-			"ROSVersion": ros.Version,
-		})
+	gw := a.MT.GetInterfaceGateways()
+	currentIface, currentGW := a.MT.GetCurrentDefaultIface()
+
+	data := merge(a.baseData(r), map[string]any{
+		"Users":               users,
+		"Tables":              tables,
+		"Leases":              leases,
+		"Interfaces":          ifaces,
+		"Gateways":            gw,
+		"CurrentDefaultIface": currentIface,
+		"CurrentDefaultGW":    currentGW,
+		"CustomCount":         custom,
+		"BlockedCount":        blocked,
+		"ROSVersion":          ros.Version,
+	})
 	if m := r.URL.Query().Get("ok"); m != "" {
 		data["Success"] = m
 	}
