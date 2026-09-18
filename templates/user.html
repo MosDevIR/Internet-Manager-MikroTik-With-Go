@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="{{.HTMLLang}}" dir="{{.Dir}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{index .T "user_panel"}}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <span class="brand">{{index .T "user_panel"}}</span>
+      <div>
+        <span style="margin-left:12px;font-size:12px;opacity:.8">{{.IP}}</span>
+        <a href="/lang?lang=fa">FA</a>
+        <a href="/lang?lang=en">EN</a>
+        <a href="/about">{{index .T "about"}}</a>
+        <a href="/logout">{{index .T "logout"}}</a>
+      </div>
+    </div>
+    {{if .Error}}<div class="alert alert-danger">{{.Error}}</div>{{end}}
+    {{if .Success}}<div class="alert alert-success">{{.Success}}</div>{{end}}
+    <div class="card">
+      <h3>{{index .T "current_status"}}</h3>
+      <p>{{index .T "your_ip"}}: <strong>{{.IP}}</strong></p>
+      <p>{{index .T "active_internet"}}:
+        <span class="badge {{if eq .Current "main"}}badge-gray{{else}}badge-blue{{end}}">
+          {{if eq .Current "main"}}{{index .T "default"}}{{else}}{{.CurrentName}}{{end}}
+        </span>
+      </p>
+    </div>
+    <h3>{{index .T "change_my_internet"}}</h3>
+    <form method="post">
+      <label>{{index .T "select_table"}}</label>
+      <select name="routing_mark">
+        <option value="main" {{if eq .Current "main"}}selected{{end}}>{{index .T "default"}} (main)</option>
+        {{range .Tables}}
+          {{if ne .ID "main"}}
+          <option value="{{.ID}}" {{if eq $.Current .ID}}selected{{end}}>{{.Name}}</option>
+          {{end}}
+        {{end}}
+      </select>
+      <button type="submit" class="btn-success">{{index .T "apply"}}</button>
+    </form>
+  </div>
+</body>
+</html>

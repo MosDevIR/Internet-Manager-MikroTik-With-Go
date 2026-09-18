@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="{{.HTMLLang}}" dir="{{.Dir}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{index .T "system_logs"}}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .live-dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#94a3b8; margin-left:6px; }
+    .live-dot.on { background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.25); animation:pulse 1.2s infinite; }
+    @keyframes pulse { 50% { opacity:.5; } }
+    .topic-chip {
+      display:inline-block; padding:2px 8px; margin:2px; border-radius:999px;
+      background:#f1f5f9; color:#334155; font-size:11px; text-decoration:none; border:1px solid #e2e8f0;
+    }
+    .topic-chip.active { background:#dbeafe; color:#1e40af; border-color:#93c5fd; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <span class="brand">{{index .T "system_logs"}} <span id="live-indicator" class="live-dot {{if .Live}}on{{end}}"></span></span>
+      <div>
+        <span style="font-size:11px;opacity:.7;margin-left:10px">ROS {{.ROSVersion}}</span>
+        <a href="/admin">{{index .T "users"}}</a>
+        <a href="/logs">{{index .T "logs"}}</a>
+        <a href="/lang?lang=fa">FA</a>
+        <a href="/lang?lang=en">EN</a>
+        <a href="/about">{{index .T "about"}}</a>
+        <a href="/logout">{{index .T "logout"}}</a>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <form method="get" id="filter-form" class="form-row" style="align-items:flex-end">
+        <div>
+          <label>{{index .T "topic"}}</label>
+          <select name="topic" id="topic">
+            <option value="">{{index .T "all"}}</option>
+            <option value="error" {{if eq .Topic "error"}}selected{{end}}>error</option>
+            <option value="warning" {{if eq .Topic "warning"}}selected{{end}}>warning</option>
+            <option value="critical" {{if eq .Topic "critical"}}selected{{end}}>critical</option>
+            <option value="info" {{if eq .Topic "info"}}selected{{end}}>info</option>
+            <option value="system" {{if eq .Topic "system"}}selected{{end}}>system</option>
+            <option value="firewall" {{if eq .Topic "firewall"}}selected{{end}}>firewall</option>
+            <option value="dhcp" {{if eq .Topic "dhcp"}}selected{{end}}>dhcp</option>
+            <option value="interface" {{if eq .Topic "interface"}}selected{{end}}>interface</option>
+            <option value="route" {{if eq .Topic "route"}}selected{{end}}>route</option>
+            <option value="script" {{if eq .Topic "script"}}selected{{end}}>script</option>
+            <option value="account" {{if eq .Topic "account"}}selected{{end}}>account</option>
+          </select>
+        </div>
+        <div>
+          <label>{{index .T "search_msg"}}</label>
+          <input type="text" name="q" id="q" value="{{.Search}}">
+        </div>
+        <div>
+          <label>{{index .T "count"}}</label>
+          <select name="limit" id="limit">
+            <option value="50" {{if eq .Limit 50}}selected{{end}}>50</option>
+            <option value="100" {{if eq .Limit 100}}selected{{end}}>100</option>
+            <option value="200" {{if eq .Limit 200}}selected{{end}}>200</option>
+            <option value="500" {{if eq .Limit 500}}selected{{end}}>500</option>
+          </select>
+        </div>
+        <div>
+          <label>{{index .T "live"}}</label>
+          <select name="live" id="live">
+            <option value="0" {{if not .Live}}selected{{end}}>{{index .T "live_off"}}</option>
+            <option value="1" {{if .Live}}selected{{end}}>{{index .T "live_on"}}</option>
+          </select>
+        </div>
+        <div>
+          <button type="submit" class="btn-success">{{index .T "apply_filter"}}</button>
+        </div>
+      </form>
+      <div style="margin-top:10px">
+        <a class="topic-chip {{if eq .Topic ""}}active{{end}}" href="/logs?limit={{.Limit}}&live={{if .Live}}1{{else}}0{{end}}">{{index .T "all"}}</a>
+        <a class="topic-chip {{if eq .Topic "error"}}active{{end}}" href="/logs?topic=error&limit={{.Limit}}&live={{if .Live}}1{{else}}0{{end}}">error</a>
+        <a class="topic-chip {{if eq .Topic "warning"}}active{{end}}" href="/logs?topic=warning&limit={{.Limit}}&live={{if .Live}}1{{else}}0{{end}}">warning</a>
+        <a class="topic-chip {{if eq .Topic "firewall"}}active{{end}}" href="/logs?topic=firewall&limit={{.Limit}}&live={{if .Live}}1{{else}}0{{end}}">firewall</a>
+        <a class="topic-chip {{if eq .Topic "system"}}active{{end}}" href="/logs?topic=system&limit={{.Limit}}&live={{if .Live}}1{{else}}0{{end}}">system</a>
+        <a class="topic-chip {{if eq .Topic "dhcp"}}active{{end}}" href="/logs?topic=dhcp&limit={{.Limit}}&live={{if .Live}}1{{else}}0{{end}}">dhcp</a>
+      </div>
+      <p style="font-size:12px;color:#64748b;margin-top:8px">
+        {{index .T "view_only"}} — {{index .T "shown"}}: <strong id="log-count">{{.Count}}</strong>
+        <span id="last-update" style="margin-right:12px"></span>
+      </p>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:90px">{{index .T "time"}}</th>
+          <th style="width:160px">{{index .T "topics"}}</th>
+          <th>{{index .T "message"}}</th>
+        </tr>
+      </thead>
+      <tbody id="log-body">
+        {{range .Logs}}
+        <tr>
+          <td style="font-size:12px;white-space:nowrap">{{index . "time"}}</td>
+          <td style="font-size:12px"><code>{{index . "topics"}}</code></td>
+          <td style="font-size:13px">{{index . "message"}}</td>
+        </tr>
+        {{else}}
+        <tr><td colspan="3" style="text-align:center;color:#94a3b8">{{index $.T "no_logs"}}</td></tr>
+        {{end}}
+      </tbody>
+    </table>
+  </div>
+<script>
+  (function () {
+    var live = {{if .Live}}true{{else}}false{{end}};
+    var timer = null;
+    var indicator = document.getElementById('live-indicator');
+    var lastFingerprint = '';
+    var failCount = 0;
+    var baseInterval = 3000;
+    var inFlight = false;
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function fingerprint(logs) {
+      if (!logs || !logs.length) return 'empty';
+      var first = logs[0] || {};
+      var last = logs[logs.length - 1] || {};
+      return logs.length + '|' + (first.time || '') + '|' + (first.message || '') + '|' + (last.time || '') + '|' + (last.message || '');
+    }
+
+    function render(logs) {
+      var fp = fingerprint(logs);
+      if (fp === lastFingerprint) return;
+      lastFingerprint = fp;
+      var body = document.getElementById('log-body');
+      if (!logs || !logs.length) {
+        body.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#94a3b8">لاگی یافت نشد</td></tr>';
+        document.getElementById('log-count').textContent = '0';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < logs.length; i++) {
+        var row = logs[i];
+        html += '<tr><td style="font-size:12px;white-space:nowrap">' + esc(row.time) +
+          '</td><td style="font-size:12px"><code>' + esc(row.topics) +
+          '</code></td><td style="font-size:13px">' + esc(row.message) + '</td></tr>';
+      }
+      body.innerHTML = html;
+      document.getElementById('log-count').textContent = String(logs.length);
+      var now = new Date();
+      document.getElementById('last-update').textContent =
+        'آخرین بروزرسانی: ' + now.toLocaleTimeString('fa-IR');
+    }
+
+    function currentInterval() {
+      // backoff ملایم بعد از خطا
+      if (failCount <= 0) return baseInterval;
+      if (failCount === 1) return 5000;
+      if (failCount === 2) return 8000;
+      return 12000;
+    }
+
+    function scheduleNext() {
+      if (!live) return;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(tick, currentInterval());
+    }
+
+    function fetchLogs() {
+      if (inFlight) return;
+      if (document.hidden) { scheduleNext(); return; }
+      inFlight = true;
+      var params = new URLSearchParams();
+      params.set('limit', document.getElementById('limit').value || '100');
+      var topic = document.getElementById('topic').value;
+      var q = document.getElementById('q').value;
+      if (topic) params.set('topic', topic);
+      if (q) params.set('q', q);
+      fetch('/api/logs?' + params.toString(), { credentials: 'same-origin', cache: 'no-store' })
+        .then(function (r) {
+          if (!r.ok) throw new Error('http ' + r.status);
+          return r.json();
+        })
+        .then(function (data) {
+          failCount = 0;
+          render(data.logs || []);
+        })
+        .catch(function () {
+          failCount++;
+          document.getElementById('last-update').textContent = 'خطا در دریافت لاگ';
+        })
+        .finally(function () {
+          inFlight = false;
+          scheduleNext();
+        });
+    }
+
+    function tick() { fetchLogs(); }
+
+    function setLive(on) {
+      live = on;
+      if (indicator) indicator.classList.toggle('on', on);
+      if (timer) { clearTimeout(timer); timer = null; }
+      if (on) fetchLogs();
+    }
+
+    document.addEventListener('visibilitychange', function () {
+      if (!live) return;
+      if (!document.hidden) fetchLogs();
+    });
+
+    if (live) setLive(true);
+
+    document.getElementById('live').addEventListener('change', function () {
+      var on = this.value === '1';
+      var url = new URL(window.location.href);
+      url.searchParams.set('live', on ? '1' : '0');
+      url.searchParams.set('limit', document.getElementById('limit').value);
+      var topic = document.getElementById('topic').value;
+      var q = document.getElementById('q').value;
+      if (topic) url.searchParams.set('topic', topic); else url.searchParams.delete('topic');
+      if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
+      window.location.href = url.toString();
+    });
+  })();
+  </script>
+
+</body>
+</html>

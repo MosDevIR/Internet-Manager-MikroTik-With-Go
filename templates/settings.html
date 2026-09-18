@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="{{.HTMLLang}}" dir="{{.Dir}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{index .T "super_panel"}}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <span class="brand">{{index .T "super_panel"}}</span>
+      <div>
+        <span style="font-size:11px;opacity:.7;margin-left:10px">ROS {{.ROSVersion}}</span>
+        <a href="/admin">{{index .T "users"}}</a>
+        <a href="/logs">{{index .T "logs"}}</a>
+        <a href="/settings">{{index .T "settings"}}</a>
+        <a href="/lang?lang=fa">FA</a>
+        <a href="/lang?lang=en">EN</a>
+        <a href="/about">{{index .T "about"}}</a>
+        <a href="/logout">{{index .T "logout"}}</a>
+      </div>
+    </div>
+    {{if .Error}}<div class="alert alert-danger">{{.Error}}</div>{{end}}
+    {{if .Success}}<div class="alert alert-success">{{.Success}}</div>{{end}}
+    <form method="post">
+      <h3>{{index .T "iface_naming"}}</h3>
+      <p style="font-size:12px;color:#64748b;margin-bottom:12px">{{index .T "iface_hint"}}</p>
+      {{range $id, $name := .Interfaces}}
+      <div class="form-row" style="align-items:center">
+        <div style="flex:0 0 180px"><code>{{$id}}</code></div>
+        <div><input type="text" name="iface_{{$id}}" value="{{$name}}"></div>
+      </div>
+      {{end}}
+      <h3>{{index .T "table_naming"}}</h3>
+      <p style="font-size:12px;color:#64748b;margin-bottom:12px">{{index .T "table_hint"}}</p>
+      {{range .Tables}}
+      <div class="form-row" style="align-items:center">
+        <div style="flex:0 0 180px"><code>{{.ID}}</code></div>
+        <div><input type="text" name="table_{{.ID}}" value="{{.Name}}"></div>
+      </div>
+      {{end}}
+      <button type="submit" class="btn-success" style="margin-top:12px">{{index .T "save_names"}}</button>
+    </form>
+    {{if .IsV7}}
+    <div class="card" style="margin-top:24px">
+      <h3>{{index .T "create_table"}}</h3>
+      <form method="post" class="form-row">
+        <div>
+          <label>{{index .T "table_name"}}</label>
+          <input type="text" name="new_table_name" required>
+        </div>
+        <div>
+          <button type="submit" name="create_table" class="btn-success">{{index .T "create_table_btn"}}</button>
+        </div>
+      </form>
+    </div>
+    {{else}}
+    <div class="card" style="margin-top:24px">
+      <p style="font-size:13px;color:#64748b">{{index .T "v6_no_table"}}</p>
+    </div>
+    {{end}}
+    <h3 style="margin-top:28px">{{index .T "map_tables"}}</h3>
+    <form method="post">
+      {{range .Tables}}
+        {{if ne .ID "main"}}
+        <div class="form-row" style="align-items:center">
+          <div style="flex:0 0 180px"><strong>{{.Name}}</strong> <small style="color:#94a3b8">({{.ID}})</small></div>
+          <div>
+            <select name="interface_for_{{.ID}}">
+              <option value="">{{index $.T "not_selected"}}</option>
+              {{range $id, $name := $.Interfaces}}
+                <option value="{{$id}}" {{if eq (index $.Settings.TableInterfaceMap $.ID) $id}}selected{{end}}>{{$name}}</option>
+              {{end}}
+            </select>
+          </div>
+        </div>
+        {{end}}
+      {{end}}
+      <button type="submit" name="update_table_interfaces" class="btn-success" style="margin-top:10px">{{index .T "save_map"}}</button>
+    </form>
+  </div>
+</body>
+</html>

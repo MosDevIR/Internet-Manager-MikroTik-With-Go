@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="{{.HTMLLang}}" dir="{{.Dir}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{index .T "admin_panel"}}</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <span class="brand">{{index .T "admin_panel"}}</span>
+      <div>
+        <span style="font-size:11px;opacity:.7;margin-left:10px">ROS {{.ROSVersion}}</span>
+        <a href="/admin">{{index .T "users"}}</a>
+        <a href="/logs">{{index .T "logs"}}</a>
+        <a href="/lang?lang=fa">FA</a>
+        <a href="/lang?lang=en">EN</a>
+        <a href="/about">{{index .T "about"}}</a>
+        <a href="/logout">{{index .T "logout"}}</a>
+      </div>
+    </div>
+    {{if .Error}}<div class="alert alert-danger">{{.Error}}</div>{{end}}
+    {{if .Success}}<div class="alert alert-success">{{.Success}}</div>{{end}}
+    <div class="stats">
+      <div class="stat"><div class="num">{{len .Users}}</div><div class="label">{{index .T "total_users"}}</div></div>
+      <div class="stat"><div class="num">{{.CustomCount}}</div><div class="label">{{index .T "custom_internet"}}</div></div>
+      <div class="stat"><div class="num">{{.BlockedCount}}</div><div class="label">{{index .T "blocked"}}</div></div>
+      <div class="stat"><div class="num">{{len .Tables}}</div><div class="label">{{index .T "routing_tables"}}</div></div>
+    </div>
+    <h3>{{index .T "user_list"}}</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>IP</th><th>MAC</th><th>Host</th><th>{{index .T "internet"}}</th>
+          <th>{{index .T "status"}}</th><th>{{index .T "label"}}</th><th>{{index .T "actions"}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{range .Users}}
+        <tr>
+          <td><strong>{{.IP}}</strong></td>
+          <td style="font-size:12px">{{.MAC}}</td>
+          <td>{{.Host}}</td>
+          <td>
+            <span class="badge {{if eq .Mark "main"}}badge-gray{{else}}badge-blue{{end}}">
+              {{if eq .Mark "main"}}{{index $.T "default"}}{{else}}{{.Mark}}{{end}}
+            </span>
+          </td>
+          <td>
+            {{if .Blocked}}<span class="badge badge-red">{{index $.T "blocked"}}</span>
+            {{else}}<span class="badge badge-green">{{index $.T "active"}}</span>{{end}}
+          </td>
+          <td>
+            <form method="post" class="form-row" style="margin:0;gap:4px">
+              <input type="hidden" name="client_ip" value="{{.IP}}">
+              <input type="text" name="new_label" value="{{.Label}}" style="margin:0;padding:4px 8px">
+              <button type="submit" name="save_label" class="btn-sm btn-outline">{{index $.T "save"}}</button>
+            </form>
+          </td>
+          <td class="actions">
+            <form method="post">
+              <input type="hidden" name="client_ip" value="{{.IP}}">
+              {{if ne .Mark "main"}}
+                <button type="submit" name="remove_internet" class="btn-sm btn-warning">{{index $.T "set_default"}}</button>
+              {{end}}
+              {{if .Blocked}}
+                <button type="submit" name="unblock_ip" class="btn-sm btn-success">{{index $.T "unblock"}}</button>
+              {{else}}
+                <button type="submit" name="block_ip" class="btn-sm btn-danger">{{index $.T "block"}}</button>
+              {{end}}
+            </form>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+    <h3>{{index .T "quick_change"}}</h3>
+    <form method="post" class="form-row">
+      <div>
+        <label>{{index .T "user_ip"}}</label>
+        <select name="client_ip">
+          {{range .Leases}}
+            <option value="{{index . "address"}}">{{index . "host-name"}} — {{index . "address"}}</option>
+          {{end}}
+        </select>
+      </div>
+      <div>
+        <label>{{index .T "new_internet"}}</label>
+        <select name="new_internet">
+          {{range .Tables}}{{if ne .ID "main"}}
+            <option value="{{.ID}}">{{.Name}}</option>
+          {{end}}{{end}}
+        </select>
+      </div>
+      <div>
+        <button type="submit" name="change_internet" class="btn-success">{{index .T "apply_btn"}}</button>
+        <button type="submit" name="remove_internet" class="btn-warning">{{index .T "back_default"}}</button>
+      </div>
+    </form>
+    <h3>{{index .T "default_route"}}</h3>
+    <form method="post" class="form-row">
+      <div>
+        <label>{{index .T "out_iface"}}</label>
+        <select name="default_iface">
+          {{range $id, $name := .Interfaces}}
+            <option value="{{$id}}">{{$name}}{{with index $.Gateways $id}} → {{.}}{{end}}</option>
+          {{end}}
+        </select>
+      </div>
+      <div>
+        <button type="submit" name="change_default" class="btn-warning">{{index .T "save_default_route"}}</button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

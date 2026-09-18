@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="{{.HTMLLang}}" dir="{{.Dir}}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{index .T "about_title"}}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    .about-hero { text-align: center; padding: 28px 16px 8px; }
+    .avatar { width: 112px; height: 112px; border-radius: 50%; border: 3px solid #e2e8f0; object-fit: cover; box-shadow: 0 8px 24px rgba(15,23,42,.12); }
+    .about-name { font-size: 1.5rem; margin: 14px 0 4px; color: #0f172a; }
+    .about-handle { color: #64748b; font-size: 14px; margin-bottom: 12px; }
+    .about-bio { max-width: 520px; margin: 0 auto 18px; color: #475569; line-height: 1.7; font-size: 14px; }
+    .about-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 16px 0 8px; }
+    .about-links a { display: inline-flex; padding: 9px 14px; border-radius: 8px; text-decoration: none; background: #0f172a; color: #fff; font-size: 13px; }
+    .about-links a.secondary { background: #fff; color: #0f172a; border: 1px solid #cbd5e1; }
+    .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 8px; }
+    .meta-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; text-align: center; }
+    .meta-card .v { font-size: 1.25rem; font-weight: 700; color: #1e40af; }
+    .meta-card .k { font-size: 12px; color: #64748b; margin-top: 4px; }
+    .project-box { margin-top: 20px; padding: 16px; border-radius: 10px; background: linear-gradient(135deg, #eff6ff, #f8fafc); border: 1px solid #dbeafe; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="nav">
+      <span class="brand">{{index .T "about_title"}}</span>
+      <div>
+        <a href="/lang?lang=fa">FA</a>
+        <a href="/lang?lang=en">EN</a>
+        <a href="/login">{{index .T "login"}}</a>
+        <a href="/about">{{index .T "about"}}</a>
+      </div>
+    </div>
+    <div class="about-hero">
+      <img class="avatar" src="https://avatars.githubusercontent.com/u/208268107?v=4" alt="MosDevIR" onerror="this.style.display='none'">
+      <h1 class="about-name">{{index .T "about_name"}}</h1>
+      <div class="about-handle">Mostafa Nekooei · @MosDevIR</div>
+      <p class="about-bio">{{index .T "about_bio"}}</p>
+      <div class="about-links">
+        <a href="https://github.com/MosDevIR" target="_blank" rel="noopener">GitHub · MosDevIR</a>
+        <a class="secondary" href="https://github.com/MosDevIR/internet-manager-mikrotik-with-flask" target="_blank" rel="noopener">Flask project</a>
+        <a class="secondary" href="mailto:nekooei.developer@gmail.com">Email</a>
+      </div>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-card"><div class="v">MosDevIR</div><div class="k">GitHub</div></div>
+      <div class="meta-card"><div class="v">Go</div><div class="k">Stack</div></div>
+      <div class="meta-card"><div class="v">ROS 6/7</div><div class="k">Compatible</div></div>
+      <div class="meta-card"><div class="v">FA / EN</div><div class="k">{{index .T "lang"}}</div></div>
+    </div>
+    <div class="project-box">
+      <h3 style="margin-top:0">{{index .T "about_project"}}</h3>
+      <p style="font-size:14px;color:#334155;line-height:1.7;margin:0">{{index .T "about_project_body"}}</p>
+      <p style="font-size:13px;color:#64748b;margin:12px 0 0">
+        {{index .T "contact"}}: <a href="mailto:nekooei.developer@gmail.com">nekooei.developer@gmail.com</a>
+        · {{index .T "github"}}: <a href="https://github.com/MosDevIR" target="_blank" rel="noopener">github.com/MosDevIR</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>
