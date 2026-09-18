@@ -360,7 +360,53 @@ func (c *Client) SetDefaultRoute(iface string, ros *models.ROSInfo) error {
 	return c.addRoute(cli, "0.0.0.0/0", gw, "main", ros)
 }
 
-v
+// GetCurrentDefaultIface اینترفیس و گیت‌وی روت پیش‌فرض جدول main را برمی‌گرداند
+func (c *Client) GetCurrentDefaultIface() (iface, gateway string) {
+	cli, err := c.connect()
+	if err != nil {
+		return "", ""
+	}
+	defer cli.Close()
+
+	reply, err := cli.Run("/ip/route/print", "?dst-address=0.0.0.0/0")
+	if err != nil {
+		return "", ""
+	}
+
+	for _, re := range reply.Re {
+		table := re.Map["routing-table"]
+		if table != "" && table != "main" {
+			continue
+		}
+		if re.Map["active"] == "false" {
+			continue
+		}
+
+		gw := re.Map["gateway"]
+		ifc := re.Map["interface"]
+
+		if ifc != "" {
+			return ifc, gw
+		}
+
+		if gw != "" {
+			dhcp, _ := cli.Run("/ip/dhcp-client/print")
+			for _, d := range dhcp.Re {
+				if d.Map["gateway"] == gw && d.Map["status"] == "bound" {
+					return d.Map["interface"], gw
+				}
+			}
+			routes, _ := cli.Run("/ip/route/print", "?gateway="+gw)
+			for _, r := range routes.Re {
+				if r.Map["interface"] != "" {
+					return r.Map["interface"], gw
+				}
+			}
+			return "", gw
+		}
+	}
+	return "", ""
+}
 
 func (c *Client) ApplyTableRoutes(s models.Settings, ros *models.ROSInfo) {
 	gws := c.GetInterfaceGateways()
