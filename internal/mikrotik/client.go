@@ -408,6 +408,54 @@ func (c *Client) GetCurrentDefaultIface() (iface, gateway string) {
 	return "", ""
 }
 
+// GetDetectedTableInterfaces از روت‌های واقعی روتر نگاشت جدول → اینترفیس را تشخیص می‌دهد
+func (c *Client) GetDetectedTableInterfaces(ros *models.ROSInfo) map[string]string {
+	cli, err := c.connect()
+	if err != nil {
+		return nil
+	}
+	defer cli.Close()
+
+	// gateway → interface (از dhcp-client و روت‌ها)
+	gwToIface := make(map[string]string)
+	gws := c.GetInterfaceGateways()
+	for iface, gw := range gws {
+		if gw != "" {
+			gwToIface[gw] = iface
+		}
+	}
+
+	res := make(map[string]string)
+	reply, err := cli.Run("/ip/route/print", "?dst-address=0.0.0.0/0")
+	if err != nil {
+		return res
+	}
+
+	for _, re := range reply.Re {
+		table := re.Map["routing-table"]
+		if table == "" {
+			table = re.Map["routing-mark"]
+		}
+		if table == "" || table == "main" {
+			continue
+		}
+
+		ifc := re.Map["interface"]
+		gw := re.Map["gateway"]
+
+		if ifc != "" {
+			res[table] = ifc
+			continue
+		}
+		if gw != "" {
+			if iface, ok := gwToIface[gw]; ok {
+				res[table] = iface
+			}
+		}
+	}
+	return res
+}
+
 func (c *Client) ApplyTableRoutes(s models.Settings, ros *models.ROSInfo) {
 	gws := c.GetInterfaceGateways()
 	cli, err := c.connect()

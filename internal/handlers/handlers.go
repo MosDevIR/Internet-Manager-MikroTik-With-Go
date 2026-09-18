@@ -387,6 +387,17 @@ func (a *App) settingsPanel(w http.ResponseWriter, r *http.Request) {
 	ifaces := a.MT.GetInterfaces(settings)
 	gateways := a.MT.GetInterfaceGateways()
 
+	// اگر نگاشت در settings خالی است، از روت‌های واقعی روتر پر کن (فقط برای نمایش)
+	detected := a.MT.GetDetectedTableInterfaces(ros)
+	if settings.TableInterfaceMap == nil {
+		settings.TableInterfaceMap = make(map[string]string)
+	}
+	for table, iface := range detected {
+		if settings.TableInterfaceMap[table] == "" {
+			settings.TableInterfaceMap[table] = iface
+		}
+	}
+
 	data := merge(a.baseData(r), map[string]any{
 		"Interfaces": ifaces, "Tables": tables, "Settings": settings,
 		"Gateways": gateways, "ROSVersion": ros.Version, "IsV7": ros.IsV7,
