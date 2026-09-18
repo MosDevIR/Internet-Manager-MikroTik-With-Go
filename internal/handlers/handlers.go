@@ -249,16 +249,25 @@ func (a *App) adminPanel(w http.ResponseWriter, r *http.Request) {
 			}
 		case r.FormValue("block_ip") != "":
 			settings.BlockedIPs = models.AppendUnique(settings.BlockedIPs, ip)
-			_ = a.Store.Save(settings)
-			msg = "کاربر مسدود شد"
+			if e := a.Store.Save(settings); e != nil {
+				ok, msg = false, "خطا در ذخیره: "+e.Error()
+			} else {
+				msg = "کاربر مسدود شد"
+			}
 		case r.FormValue("unblock_ip") != "":
 			settings.BlockedIPs = models.RemoveItem(settings.BlockedIPs, ip)
-			_ = a.Store.Save(settings)
-			msg = "کاربر فعال شد"
+			if e := a.Store.Save(settings); e != nil {
+				ok, msg = false, "خطا در ذخیره: "+e.Error()
+			} else {
+				msg = "کاربر فعال شد"
+			}
 		case r.FormValue("save_label") != "":
 			settings.UserLabels[ip] = strings.TrimSpace(r.FormValue("new_label"))
-			_ = a.Store.Save(settings)
-			msg = "توضیح ذخیره شد"
+			if e := a.Store.Save(settings); e != nil {
+				ok, msg = false, "خطا در ذخیره: "+e.Error()
+			} else {
+				msg = "توضیح ذخیره شد"
+			}
 		case r.FormValue("change_default") != "":
 			iface := r.FormValue("default_iface")
 			if e := a.MT.SetDefaultRoute(iface, ros); e != nil {
@@ -410,8 +419,14 @@ func (a *App) settingsPanel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := merge(a.baseData(r), map[string]any{
-		"Interfaces": ifaces, "Tables": tables, "Settings": settings,
-		"Gateways": gateways, "ROSVersion": ros.Version, "IsV7": ros.IsV7,
+		"Interfaces":   ifaces,
+		"Tables":       tables,
+		"Settings":     settings,
+		"Gateways":     gateways,
+		"ROSVersion":   ros.Version,
+		"IsV7":         ros.IsV7,
+		"SettingsPath": a.Cfg.SettingsFile,
+		"DataDir":      a.Cfg.DataDir,
 	})
 	if m := r.URL.Query().Get("ok"); m != "" {
 		data["Success"] = m

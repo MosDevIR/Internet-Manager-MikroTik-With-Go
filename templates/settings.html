@@ -23,6 +23,11 @@
     </div>
     {{if .Error}}<div class="alert alert-danger">{{.Error}}</div>{{end}}
     {{if .Success}}<div class="alert alert-success">{{.Success}}</div>{{end}}
+    <div style="margin-bottom:14px;padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#475569">
+      <strong>DATA_DIR:</strong> <code>{{.DataDir}}</code>
+      &nbsp;|&nbsp;
+      <strong>settings:</strong> <code>{{.SettingsPath}}</code>
+    </div>
     <form method="post">
       <h3>{{index .T "iface_naming"}}</h3>
       <p style="font-size:12px;color:#64748b;margin-bottom:12px">{{index .T "iface_hint"}}</p>
