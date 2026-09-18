@@ -378,7 +378,18 @@ func (a *App) settingsPanel(w http.ResponseWriter, r *http.Request) {
 			msg = "ارتباط جدول‌ها ذخیره شد"
 		}
 
-		_ = a.Store.Save(settings)
+		if err := a.Store.Save(settings); err != nil {
+			a.render(w, "settings.html", merge(a.baseData(r), map[string]any{
+				"Error":      "خطا در ذخیره تنظیمات (احتمالاً DATA_DIR قابل نوشتن نیست / mount ندارید): " + err.Error(),
+				"ROSVersion": ros.Version,
+				"IsV7":       ros.IsV7,
+				"Interfaces": a.MT.GetInterfaces(settings),
+				"Tables":     a.MT.GetTables(settings, ros),
+				"Settings":   settings,
+				"Gateways":   a.MT.GetInterfaceGateways(),
+			}))
+			return
+		}
 		http.Redirect(w, r, "/settings?ok="+msg, http.StatusFound)
 		return
 	}
