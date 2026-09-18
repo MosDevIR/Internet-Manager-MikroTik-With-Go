@@ -6,10 +6,10 @@ import (
 	"html/template"
 	"log"
 	"net"
-	"net/http"
+	"net/http"f
 	"strings"
 	"sync"
-	"time"
+	"time"f
 
 	"internet-manager-go/internal/config"
 	"internet-manager-go/internal/i18n"
@@ -297,17 +297,17 @@ func (a *App) adminPanel(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ifaces := a.MT.GetInterfaces(settings)
-	gw := a.MT.GetInterfaceGateways()
-	currentIface, currentGW := a.MT.GetCurrentDefaultIface()
+		gw := a.MT.GetInterfaceGateways()
+		currentIface, currentGW := a.MT.GetCurrentDefaultIface()
 	
-	data := merge(a.baseData(r), map[string]any{
-		"Users": users, "Tables": tables, "Leases": leases,
-		"Interfaces": ifaces, "Gateways": gw,
-		"CurrentDefaultIface": currentIface,
-		"CurrentDefaultGW":    currentGW,
-		"CustomCount": custom, "BlockedCount": blocked,
-		"ROSVersion": ros.Version,
-	})
+		data := merge(a.baseData(r), map[string]any{
+			"Users": users, "Tables": tables, "Leases": leases,
+			"Interfaces": ifaces, "Gateways": gw,
+			"CurrentDefaultIface": currentIface,
+			"CurrentDefaultGW":    currentGW,
+			"CustomCount": custom, "BlockedCount": blocked,
+			"ROSVersion": ros.Version,
+		})
 	if m := r.URL.Query().Get("ok"); m != "" {
 		data["Success"] = m
 	}
