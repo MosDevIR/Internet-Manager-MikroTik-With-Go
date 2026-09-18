@@ -99,12 +99,35 @@
       </div>
     </form>
     <h3>{{index .T "default_route"}}</h3>
+
+    {{if .CurrentDefaultIface}}
+    <div style="margin-bottom:12px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:14px">
+      <strong>اینترنت پیش‌فرض فعلی:</strong>
+      <span style="color:#15803d;font-weight:600">{{index .Interfaces .CurrentDefaultIface}}{{if not (index .Interfaces .CurrentDefaultIface)}}{{.CurrentDefaultIface}}{{end}}</span>
+      {{if .CurrentDefaultGW}}
+        <span style="color:#64748b;margin-right:8px">→ {{.CurrentDefaultGW}}</span>
+      {{end}}
+    </div>
+    {{else if .CurrentDefaultGW}}
+    <div style="margin-bottom:12px;padding:10px 14px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;font-size:14px">
+      <strong>گیت‌وی پیش‌فرض فعلی:</strong>
+      <span style="color:#a16207;font-weight:600">{{.CurrentDefaultGW}}</span>
+      <span style="color:#64748b">(اینترفیس مشخص نشد)</span>
+    </div>
+    {{else}}
+    <div style="margin-bottom:12px;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:14px;color:#b91c1c">
+      روت پیش‌فرض فعالی پیدا نشد
+    </div>
+    {{end}}
+
     <form method="post" class="form-row">
       <div>
         <label>{{index .T "out_iface"}}</label>
         <select name="default_iface">
           {{range $id, $name := .Interfaces}}
-            <option value="{{$id}}">{{$name}}{{with index $.Gateways $id}} → {{.}}{{end}}</option>
+            <option value="{{$id}}" {{if eq $id $.CurrentDefaultIface}}selected{{end}}>
+              {{$name}}{{with index $.Gateways $id}} → {{.}}{{end}}
+            </option>
           {{end}}
         </select>
       </div>
