@@ -298,10 +298,13 @@ func (a *App) adminPanel(w http.ResponseWriter, r *http.Request) {
 
 	ifaces := a.MT.GetInterfaces(settings)
 	gw := a.MT.GetInterfaceGateways()
-
+	currentIface, currentGW := a.MT.GetCurrentDefaultIface()
+	
 	data := merge(a.baseData(r), map[string]any{
 		"Users": users, "Tables": tables, "Leases": leases,
 		"Interfaces": ifaces, "Gateways": gw,
+		"CurrentDefaultIface": currentIface,
+		"CurrentDefaultGW":    currentGW,
 		"CustomCount": custom, "BlockedCount": blocked,
 		"ROSVersion": ros.Version,
 	})
