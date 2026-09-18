@@ -98,25 +98,28 @@
         <button type="submit" name="remove_internet" class="btn-warning">{{index .T "back_default"}}</button>
       </div>
     </form>
+
     <h3>{{index .T "default_route"}}</h3>
 
     {{if .CurrentDefaultIface}}
     <div style="margin-bottom:12px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:14px">
-      <strong>اینترنت پیش‌فرض فعلی:</strong>
-      <span style="color:#15803d;font-weight:600">{{index .Interfaces .CurrentDefaultIface}}{{if not (index .Interfaces .CurrentDefaultIface)}}{{.CurrentDefaultIface}}{{end}}</span>
+      <strong>{{index .T "current_default"}}:</strong>
+      <span style="color:#15803d;font-weight:600">
+        {{with index .Interfaces .CurrentDefaultIface}}{{.}}{{else}}{{.CurrentDefaultIface}}{{end}}
+      </span>
       {{if .CurrentDefaultGW}}
-        <span style="color:#64748b;margin-right:8px">→ {{.CurrentDefaultGW}}</span>
+        <span style="color:#64748b;margin-inline-start:8px">→ {{.CurrentDefaultGW}}</span>
       {{end}}
     </div>
     {{else if .CurrentDefaultGW}}
     <div style="margin-bottom:12px;padding:10px 14px;background:#fefce8;border:1px solid #fde68a;border-radius:8px;font-size:14px">
-      <strong>گیت‌وی پیش‌فرض فعلی:</strong>
+      <strong>{{index .T "current_gateway"}}:</strong>
       <span style="color:#a16207;font-weight:600">{{.CurrentDefaultGW}}</span>
-      <span style="color:#64748b">(اینترفیس مشخص نشد)</span>
+      <span style="color:#64748b;margin-inline-start:6px">{{index .T "iface_not_detected"}}</span>
     </div>
     {{else}}
     <div style="margin-bottom:12px;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:14px;color:#b91c1c">
-      روت پیش‌فرض فعالی پیدا نشد
+      {{index .T "no_default_route"}}
     </div>
     {{end}}
 
