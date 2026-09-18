@@ -64,20 +64,26 @@
     <form method="post">
       {{range .Tables}}
         {{if ne .ID "main"}}
-        <div class="form-row" style="align-items:center">
-          <div style="flex:0 0 180px"><strong>{{.Name}}</strong> <small style="color:#94a3b8">({{.ID}})</small></div>
-          <div>
-            <select name="interface_for_{{.ID}}">
+        <div class="form-row" style="align-items:center;margin-bottom:8px">
+          <div style="flex:0 0 200px">
+            <strong>{{.Name}}</strong>
+            <small style="color:#94a3b8;display:block">({{.ID}})</small>
+          </div>
+          <div style="flex:1">
+            {{$tableID := .ID}}
+            <select name="interface_for_{{.ID}}" style="min-width:240px">
               <option value="">{{index $.T "not_selected"}}</option>
               {{range $id, $name := $.Interfaces}}
-                <option value="{{$id}}" {{if eq (index $.Settings.TableInterfaceMap $.ID) $id}}selected{{end}}>{{$name}}</option>
+                <option value="{{$id}}" {{if eq (index $.Settings.TableInterfaceMap $tableID) $id}}selected{{end}}>
+                  {{$name}}{{with index $.Gateways $id}} → {{.}}{{end}}
+                </option>
               {{end}}
             </select>
           </div>
         </div>
         {{end}}
       {{end}}
-      <button type="submit" name="update_table_interfaces" class="btn-success" style="margin-top:10px">{{index .T "save_map"}}</button>
+      <button type="submit" name="update_table_interfaces" class="btn-success" style="margin-top:12px">{{index .T "save_map"}}</button>
     </form>
   </div>
 </body>
