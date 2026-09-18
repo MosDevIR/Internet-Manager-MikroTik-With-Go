@@ -12,13 +12,17 @@
     .about-handle { color: #64748b; font-size: 14px; margin-bottom: 12px; }
     .about-bio { max-width: 520px; margin: 0 auto 18px; color: #475569; line-height: 1.7; font-size: 14px; }
     .about-links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 16px 0 8px; }
-    .about-links a { display: inline-flex; padding: 9px 14px; border-radius: 8px; text-decoration: none; background: #0f172a; color: #fff; font-size: 13px; }
+    .about-links a { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 8px; text-decoration: none; background: #0f172a; color: #fff; font-size: 13px; }
     .about-links a.secondary { background: #fff; color: #0f172a; border: 1px solid #cbd5e1; }
+    .about-links a.social { background: #f1f5f9; color: #0f172a; border: 1px solid #e2e8f0; }
+    .about-links a.social:hover { background: #e2e8f0; }
     .meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 8px; }
     .meta-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; text-align: center; }
     .meta-card .v { font-size: 1.25rem; font-weight: 700; color: #1e40af; }
     .meta-card .k { font-size: 12px; color: #64748b; margin-top: 4px; }
     .project-box { margin-top: 20px; padding: 16px; border-radius: 10px; background: linear-gradient(135deg, #eff6ff, #f8fafc); border: 1px solid #dbeafe; }
+    .phone-box { margin: 14px 0 6px; font-size: 15px; color: #0f172a; }
+    .phone-box a { color: #1e40af; text-decoration: none; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -37,18 +41,30 @@
       <h1 class="about-name">{{index .T "about_name"}}</h1>
       <div class="about-handle">Mostafa Nekooei · @MosDevIR</div>
       <p class="about-bio">{{index .T "about_bio"}}</p>
+
+      <div class="phone-box">
+        📞 <a href="tel:+989354469126">+98 935 446 9126</a>
+      </div>
+
       <div class="about-links">
         <a href="https://github.com/MosDevIR" target="_blank" rel="noopener">GitHub · MosDevIR</a>
-        <a class="secondary" href="https://github.com/MosDevIR/internet-manager-mikrotik-with-flask" target="_blank" rel="noopener">Flask project</a>
         <a class="secondary" href="mailto:nekooei.developer@gmail.com">Email</a>
+
+        <!-- شبکه‌های اجتماعی -->
+        <a class="social" href="https://wa.me/989354469126" target="_blank" rel="noopener">واتساپ</a>
+        <a class="social" href="https://t.me/+989354469126" target="_blank" rel="noopener">تلگرام</a>
+        <a class="social" href="https://ble.ir/989354469126" target="_blank" rel="noopener">بله</a>
+        <a class="social" href="https://eitaa.com/989354469126" target="_blank" rel="noopener">ایتا</a>
       </div>
     </div>
+
     <div class="meta-grid">
       <div class="meta-card"><div class="v">MosDevIR</div><div class="k">GitHub</div></div>
-      <div class="meta-card"><div class="v">Go</div><div class="k">Stack</div></div>
       <div class="meta-card"><div class="v">ROS 6/7</div><div class="k">Compatible</div></div>
       <div class="meta-card"><div class="v">FA / EN</div><div class="k">{{index .T "lang"}}</div></div>
+      <div class="meta-card"><div class="v">Lightweight</div><div class="k">{{index .T "light_version"}}</div></div>
     </div>
+
     <div class="project-box">
       <h3 style="margin-top:0">{{index .T "about_project"}}</h3>
       <p style="font-size:14px;color:#334155;line-height:1.7;margin:0">{{index .T "about_project_body"}}</p>
