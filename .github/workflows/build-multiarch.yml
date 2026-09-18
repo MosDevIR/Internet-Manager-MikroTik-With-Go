@@ -1,0 +1,78 @@
+name: Build multi-arch binaries
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            goarm: ""
+            name: amd64
+          - goos: linux
+            goarch: arm64
+            goarm: ""
+            name: arm64
+          - goos: linux
+            goarch: arm
+            goarm: "7"
+            name: armv7
+          - goos: windows
+            goarch: amd64
+            goarm: ""
+            name: windows-amd64
+          - goos: darwin
+            goarch: arm64
+            goarm: ""
+            name: darwin-arm64
+          - goos: darwin
+            goarch: amd64
+            goarm: ""
+            name: darwin-amd64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+
+      - name: Build
+        env:
+          CGO_ENABLED: "0"
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          GOARM: ${{ matrix.goarm }}
+        run: |
+          OUT="internet-manager-${{ matrix.name }}"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            OUT="${OUT}.exe"
+          fi
+          go build -trimpath -ldflags="-s -w" -o "$OUT"
+          echo "OUT=$OUT" >> "$GITHUB_ENV"
+
+      - name: Package tar (linux only, for MikroTik container)
+        if: matrix.goos == 'linux'
+        run: |
+          mkdir -p "rootfs-${{ matrix.name }}"
+          cp "internet-manager-${{ matrix.name }}" "rootfs-${{ matrix.name }}/internet-manager"
+          chmod +x "rootfs-${{ matrix.name }}/internet-manager"
+          tar -C "rootfs-${{ matrix.name }}" -cvf "internet-manager-${{ matrix.name }}.tar" internet-manager
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: internet-manager-${{ matrix.name }}
+          path: |
+            internet-manager-${{ matrix.name }}
+            internet-manager-${{ matrix.name }}.exe
+            internet-manager-${{ matrix.name }}.tar
+          if-no-files-found: ignore
