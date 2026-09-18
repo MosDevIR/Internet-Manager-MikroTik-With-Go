@@ -23,10 +23,10 @@
     {{if .Error}}<div class="alert alert-danger">{{.Error}}</div>{{end}}
     {{if .Success}}<div class="alert alert-success">{{.Success}}</div>{{end}}
     <div class="stats">
-      <div class="stat"><div class="num">{{len .Users}}</div><div class="label">{{index .T "total_users"}}</div></div>
+      <div class="stat"><div class="num">{{if .Users}}{{len .Users}}{{else}}0{{end}}</div><div class="label">{{index .T "total_users"}}</div></div>
       <div class="stat"><div class="num">{{.CustomCount}}</div><div class="label">{{index .T "custom_internet"}}</div></div>
       <div class="stat"><div class="num">{{.BlockedCount}}</div><div class="label">{{index .T "blocked"}}</div></div>
-      <div class="stat"><div class="num">{{len .Tables}}</div><div class="label">{{index .T "routing_tables"}}</div></div>
+      <div class="stat"><div class="num">{{if .Tables}}{{len .Tables}}{{else}}0{{end}}</div><div class="label">{{index .T "routing_tables"}}</div></div>
     </div>
     <h3>{{index .T "user_list"}}</h3>
     <table>

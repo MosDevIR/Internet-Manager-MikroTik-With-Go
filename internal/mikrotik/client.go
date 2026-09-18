@@ -174,9 +174,9 @@ func (c *Client) GetDHCPLeases() []map[string]string {
 
 	reply, err := cli.Run("/ip/dhcp-server/lease/print")
 	if err != nil {
-		return nil
+		return []map[string]string{}
 	}
-	var res []map[string]string
+	res := make([]map[string]string, 0)
 	for _, re := range reply.Re {
 		if re.Map["address"] != "" {
 			res = append(res, re.Map)
@@ -234,7 +234,7 @@ func (c *Client) GetRawTableNames(ros *models.ROSInfo) []string {
 
 func (c *Client) GetTables(s models.Settings, ros *models.ROSInfo) []models.TableItem {
 	raw := c.GetRawTableNames(ros)
-	var res []models.TableItem
+	res := make([]models.TableItem, 0, len(raw))
 	for _, t := range raw {
 		name := t
 		if n, ok := s.RoutingTables[t]; ok && n != "" {
@@ -322,7 +322,8 @@ func (c *Client) addRoute(cli *routeros.Client, dst, gateway, table string, ros 
 			args = append(args, "=routing-mark="+table)
 		}
 	}
-	_, err := cli.Run("/ip/route/add", args...)
+	full := append([]string{"/ip/route/add"}, args...)
+	_, err := cli.RunArgs(full)
 	return err
 }
 
@@ -384,7 +385,7 @@ func (c *Client) GetUserStatusList(s models.Settings) []models.UserStatus {
 	for _, ip := range s.BlockedIPs {
 		blocked[ip] = true
 	}
-	var res []models.UserStatus
+	res := make([]models.UserStatus, 0)
 	for _, lease := range leases {
 		ip := lease["address"]
 		if ip == "" {

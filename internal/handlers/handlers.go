@@ -221,7 +221,12 @@ func (a *App) adminPanel(w http.ResponseWriter, r *http.Request) {
 	settings := a.Store.Load()
 	ros, err := a.MT.DetectROS()
 	if err != nil {
-		a.render(w, "admin.html", merge(a.baseData(r), map[string]any{"Error": i18n.T(i18n.FromRequest(r), "conn_failed") + ": " + err.Error()}))
+		a.render(w, "admin.html", merge(a.baseData(r), map[string]any{
+			"Error": i18n.T(i18n.FromRequest(r), "conn_failed") + ": " + err.Error(),
+			"Users": []models.UserStatus{}, "Tables": []models.TableItem{}, "Leases": []map[string]string{},
+			"Interfaces": map[string]string{}, "Gateways": map[string]string{},
+			"CustomCount": 0, "BlockedCount": 0,
+		}))
 		return
 	}
 
@@ -267,7 +272,12 @@ func (a *App) adminPanel(w http.ResponseWriter, r *http.Request) {
 		if ok {
 			http.Redirect(w, r, "/admin?ok="+msg, http.StatusFound)
 		} else {
-			a.render(w, "admin.html", merge(a.baseData(r), map[string]any{"Error": msg, "ROSVersion": ros.Version}))
+			a.render(w, "admin.html", merge(a.baseData(r), map[string]any{
+				"Error": msg, "ROSVersion": ros.Version,
+				"Users": []models.UserStatus{}, "Tables": []models.TableItem{}, "Leases": []map[string]string{},
+				"Interfaces": map[string]string{}, "Gateways": map[string]string{},
+				"CustomCount": 0, "BlockedCount": 0,
+			}))
 		}
 		return
 	}
